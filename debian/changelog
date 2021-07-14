@@ -1,3 +1,10 @@
+shadow (1:4.8.1-1ubuntu5.20.04.1) focal; urgency=medium
+
+  * Disallow purely numeric usernames. This includes hexadecimal
+    octal syntax. (LP: #1927078)
+
+ -- William 'jawn-smith' Wilson <william.wilson@canonical.com>  Wed, 14 Jul 2021 17:08:18 -0500
+
 shadow (1:4.8.1-1ubuntu5.20.04) focal; urgency=medium
 
   * debian/patches/1015_add_zsys_support.patch:

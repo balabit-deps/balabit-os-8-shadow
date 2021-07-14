@@ -25,7 +25,7 @@ Details:
  	/*
  	 * User/group names must match [a-z_][a-z0-9_-]*[$]
  	 */
-@@ -73,6 +74,26 @@
+@@ -73,7 +74,62 @@
  			return false;
  		}
  	}
@@ -37,24 +37,60 @@ Details:
 +	 *
 +	 * Allow more relaxed user/group names in Debian -- ^[^-~+:,\s][^:,\s]*$
 +	 */
++	bool is_numeric = true;
++	bool is_hex = true;
++	bool is_octal = true;
++	/*
++	 * We skip the hex and octal checks for the first two characters in the
++	 * loop, and inspect them individually before the loop starts. This
++	 * checks for "0x" and "0o" at the beginning of the username while still
++	 * treating "x" and "o" as non-numeric characters in all other scenarios
++	 */
++	int chars_checked = 0;
++
 +	if (   ('\0' == *name)
 +	    || ('-'  == *name)
 +	    || ('~'  == *name)
 +	    || ('+'  == *name)) {
 +		return false;
 +	}
++	/* if the username does not start with "0x" it is not hexadecimal */
++	if (*name != '0' || *(name + 1) != 'x') {
++		is_hex = false;
++	}
++	/* if the username does not start with "0o" it is not octal */
++	if (*name != '0' || *(name + 1) != 'o') {
++		is_octal = false;
++	}
 +	do {
 +		if ((':' == *name) || (',' == *name) || isspace(*name)) {
 +			return false;
 +		}
++		if ((*name < '0' || *name > '9')) {
++			is_numeric = false;
++		}
++		if ((*name < '0' || *name > '9') &&
++		    (*name < 'A' || *name > 'F') &&
++		    (*name < 'a' || *name > 'f') &&
++		    chars_checked >= 2) {
++			is_hex = false;
++		}
++		if ((*name < '0' || *name > '7') && chars_checked >= 2) {
++			is_octal = false;
++		}
++		chars_checked++;
 +		name++;
 +	} while ('\0' != *name);
  
++	if (is_numeric || is_hex || is_octal) {
++		return false;
++	}
  	return true;
  }
+ 
 --- a/man/useradd.8.xml
 +++ b/man/useradd.8.xml
-@@ -662,12 +662,20 @@
+@@ -662,12 +662,25 @@
      </para>
  
      <para>
@@ -73,12 +109,17 @@ Details:
 +      user's home directory.
 +    </para>
 +    <para>
++      On Ubuntu, the same constraints as Debian are in place, with the
++      additional constraint that the username cannot be fully numeric.
++      This includes octal and hexadecimal syntax.
++    </para>
++    <para>
        Usernames may only be up to 32 characters long.
      </para>
    </refsect1>
 --- a/man/groupadd.8.xml
 +++ b/man/groupadd.8.xml
-@@ -273,12 +273,18 @@
+@@ -273,12 +273,23 @@
     <refsect1 id='caveats'>
       <title>CAVEATS</title>
       <para>
@@ -94,6 +135,11 @@ Details:
 +       colon (':'), a comma (','), or a whitespace (space:' ',
 +       end of line: '\n', tabulation: '\t', etc.).
 +     </para>
++    <para>
++      On Ubuntu, the same constraints as Debian are in place, with the
++      additional constraint that the groupname cannot be fully numeric.
++      This includes octal and hexadecimal syntax.
++    </para>
 +     <para>
         Groupnames may only be up to &GROUP_NAME_MAX_LENGTH; characters long.
       </para>

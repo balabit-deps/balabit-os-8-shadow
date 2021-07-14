@@ -1,2 +1,2 @@
-Tests: smoke
+Tests: smoke, numeric-username
 Restrictions: needs-root, allow-stderr
