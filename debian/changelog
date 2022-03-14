@@ -1,3 +1,12 @@
+shadow (1:4.8.1-1ubuntu5.20.04.2) focal; urgency=medium
+
+  [ Michael Vogt ]
+  * debian/patches/1010_extrausers.patch:
+    Add automatic detection of "extrausers" for usermod -G
+    (LP: #1959375)
+
+ -- Alberto Mardegan <mardy@users.sourceforge.net>  Mon, 14 Mar 2022 11:26:09 +0300
+
 shadow (1:4.8.1-1ubuntu5.20.04.1) focal; urgency=medium
 
   * Disallow purely numeric usernames. This includes hexadecimal

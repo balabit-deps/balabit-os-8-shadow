@@ -9,11 +9,9 @@ Subject: Add support to passwd for updating libnss-extrausers locations
  src/usermod.c  | 48 +++++++++++++++++++++++++++++++++++++++++++
  4 files changed, 122 insertions(+), 1 deletion(-)
 
-diff --git a/lib/commonio.c b/lib/commonio.c
-index 9f6ceca..008691f 100644
 --- a/lib/commonio.c
 +++ b/lib/commonio.c
-@@ -419,6 +419,7 @@ int commonio_lock (struct commonio_db *db)
+@@ -419,6 +419,7 @@
  	int i;
  
  #ifdef HAVE_LCKPWDF
@@ -21,7 +19,7 @@ index 9f6ceca..008691f 100644
  	/*
  	 * Only if the system libc has a real lckpwdf() - the one from
  	 * lockpw.c calls us and would cause infinite recursion!
-@@ -448,6 +449,7 @@ int commonio_lock (struct commonio_db *db)
+@@ -448,6 +449,7 @@
  		ulckpwdf ();
  		return 0;		/* failure */
  	}
@@ -29,11 +27,9 @@ index 9f6ceca..008691f 100644
  #endif				/* !HAVE_LCKPWDF */
  
  	/*
-diff --git a/lib/defines.h b/lib/defines.h
-index 2fb1b56..ffa8b6a 100644
 --- a/lib/defines.h
 +++ b/lib/defines.h
-@@ -316,6 +316,14 @@ char *strchr (), *strrchr (), *strtok ();
+@@ -316,6 +316,14 @@
  #endif
  #endif
  
@@ -48,11 +44,9 @@ index 2fb1b56..ffa8b6a 100644
  #ifndef NULL
  #define NULL ((void *) 0)
  #endif
-diff --git a/src/passwd.c b/src/passwd.c
-index 13619b1..bfe0aea 100644
 --- a/src/passwd.c
 +++ b/src/passwd.c
-@@ -559,8 +559,15 @@ static void update_noshadow (void)
+@@ -559,8 +559,15 @@
  {
  	const struct passwd *pw;
  	struct passwd *npw;
@@ -68,7 +62,7 @@ index 13619b1..bfe0aea 100644
  		(void) fprintf (stderr,
  		                _("%s: cannot lock %s; try again later.\n"),
  		                Prog, pw_dbname ());
-@@ -568,6 +575,20 @@ static void update_noshadow (void)
+@@ -568,6 +575,20 @@
  	}
  	pw_locked = true;
  	if (pw_open (O_CREAT | O_RDWR) == 0) {
@@ -89,7 +83,7 @@ index 13619b1..bfe0aea 100644
  		(void) fprintf (stderr,
  		                _("%s: cannot open %s\n"),
  		                Prog, pw_dbname ());
-@@ -576,6 +597,21 @@ static void update_noshadow (void)
+@@ -576,6 +597,21 @@
  	}
  	pw = pw_locate (name);
  	if (NULL == pw) {
@@ -111,7 +105,7 @@ index 13619b1..bfe0aea 100644
  		(void) fprintf (stderr,
  		                _("%s: user '%s' does not exist in %s\n"),
  		                Prog, name, pw_dbname ());
-@@ -613,8 +649,15 @@ static void update_shadow (void)
+@@ -613,8 +649,15 @@
  {
  	const struct spwd *sp;
  	struct spwd *nsp;
@@ -127,7 +121,7 @@ index 13619b1..bfe0aea 100644
  		(void) fprintf (stderr,
  		                _("%s: cannot lock %s; try again later.\n"),
  		                Prog, spw_dbname ());
-@@ -622,6 +665,20 @@ static void update_shadow (void)
+@@ -622,6 +665,20 @@
  	}
  	spw_locked = true;
  	if (spw_open (O_CREAT | O_RDWR) == 0) {
@@ -148,7 +142,7 @@ index 13619b1..bfe0aea 100644
  		(void) fprintf (stderr,
  		                _("%s: cannot open %s\n"),
  		                Prog, spw_dbname ());
-@@ -632,7 +689,9 @@ static void update_shadow (void)
+@@ -632,7 +689,9 @@
  	if (NULL == sp) {
  		/* Try to update the password in /etc/passwd instead. */
  		(void) spw_close ();
@@ -159,7 +153,7 @@ index 13619b1..bfe0aea 100644
  		if (spw_unlock () == 0) {
  			(void) fprintf (stderr,
  			                _("%s: failed to unlock %s\n"),
-@@ -641,6 +700,10 @@ static void update_shadow (void)
+@@ -641,6 +700,10 @@
  			/* continue */
  		}
  		spw_locked = false;
@@ -170,11 +164,9 @@ index 13619b1..bfe0aea 100644
  		return;
  	}
  	nsp = __spw_dup (sp);
-diff --git a/src/usermod.c b/src/usermod.c
-index 05b9871..fb833e1 100644
 --- a/src/usermod.c
 +++ b/src/usermod.c
-@@ -1566,7 +1566,16 @@ static void close_files (void)
+@@ -1566,7 +1566,18 @@
   */
  static void open_files (void)
  {
@@ -185,13 +177,15 @@ index 05b9871..fb833e1 100644
 +		if (try_extrausers) {
 +			pw_setdbname (EXTRAUSERS_PASSWD_FILE);
 +			spw_setdbname (EXTRAUSERS_SHADOW_FILE);
++			gr_setdbname (EXTRAUSERS_GROUP_FILE);
++			sgr_setdbname (EXTRAUSERS_SHADOWGROUP_FILE);
 +			open_files ();
 +			return;
 +		}
  		fprintf (stderr,
  		         _("%s: cannot lock %s; try again later.\n"),
  		         Prog, pw_dbname ());
-@@ -1574,12 +1583,29 @@ static void open_files (void)
+@@ -1574,12 +1585,29 @@
  	}
  	pw_locked = true;
  	if (pw_open (O_CREAT | O_RDWR) == 0) {
@@ -221,7 +215,7 @@ index 05b9871..fb833e1 100644
  		fprintf (stderr,
  		         _("%s: cannot lock %s; try again later.\n"),
  		         Prog, spw_dbname ());
-@@ -1587,6 +1613,17 @@ static void open_files (void)
+@@ -1587,6 +1615,17 @@
  	}
  	spw_locked = true;
  	if (is_shadow_pwd && (spw_open (O_CREAT | O_RDWR) == 0)) {
@@ -239,7 +233,56 @@ index 05b9871..fb833e1 100644
  		fprintf (stderr,
  		         _("%s: cannot open %s\n"),
  		         Prog, spw_dbname ());
-@@ -1675,11 +1712,22 @@ static void usr_update (void)
+@@ -1599,6 +1638,14 @@
+ 		 * group entries.
+ 		 */
+ 		if (gr_lock () == 0) {
++			if (try_extrausers) {
++				pw_setdbname (EXTRAUSERS_PASSWD_FILE);
++				spw_setdbname (EXTRAUSERS_SHADOW_FILE);
++				gr_setdbname (EXTRAUSERS_GROUP_FILE);
++				sgr_setdbname (EXTRAUSERS_SHADOWGROUP_FILE);
++				open_files ();
++				return;
++			}
+ 			fprintf (stderr,
+ 			         _("%s: cannot lock %s; try again later.\n"),
+ 			         Prog, gr_dbname ());
+@@ -1606,6 +1653,16 @@
+ 		}
+ 		gr_locked = true;
+ 		if (gr_open (O_CREAT | O_RDWR) == 0) {
++			if (try_extrausers) {
++				gr_unlock ();
++				gr_locked = false;
++				pw_setdbname (EXTRAUSERS_PASSWD_FILE);
++				spw_setdbname (EXTRAUSERS_SHADOW_FILE);
++				gr_setdbname (EXTRAUSERS_GROUP_FILE);
++				sgr_setdbname (EXTRAUSERS_SHADOWGROUP_FILE);
++				open_files ();
++				return;
++			}
+ 			fprintf (stderr,
+ 			         _("%s: cannot open %s\n"),
+ 			         Prog, gr_dbname ());
+@@ -1613,6 +1670,16 @@
+ 		}
+ #ifdef SHADOWGRP
+ 		if (is_shadow_grp && (sgr_lock () == 0)) {
++			if (try_extrausers) {
++				gr_unlock ();
++				gr_locked = false;
++				pw_setdbname (EXTRAUSERS_PASSWD_FILE);
++				spw_setdbname (EXTRAUSERS_SHADOW_FILE);
++				gr_setdbname (EXTRAUSERS_GROUP_FILE);
++				sgr_setdbname (EXTRAUSERS_SHADOWGROUP_FILE);
++				open_files ();
++				return;
++			}
+ 			fprintf (stderr,
+ 			         _("%s: cannot lock %s; try again later.\n"),
+ 			         Prog, sgr_dbname ());
+@@ -1675,11 +1742,22 @@
  	struct spwd spent;
  	const struct spwd *spwd = NULL;
  

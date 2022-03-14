@@ -21,7 +21,7 @@ Index: shadow-4.8.1/src/useradd.c
 ===================================================================
 --- shadow-4.8.1.orig/src/useradd.c
 +++ shadow-4.8.1/src/useradd.c
-@@ -2084,6 +2084,13 @@ static void usr_update (void)
+@@ -2084,6 +2084,13 @@
   */
  static void create_home (void)
  {
@@ -35,7 +35,7 @@ Index: shadow-4.8.1/src/useradd.c
  	if (access (prefix_user_home, F_OK) != 0) {
  		char path[strlen (prefix_user_home) + 2];
  		char *bhome, *cp;
-@@ -2159,6 +2166,7 @@ static void create_home (void)
+@@ -2159,6 +2166,7 @@
  #endif
  			fail_exit (E_HOMEDIR);
  		}
@@ -95,7 +95,7 @@ Index: shadow-4.8.1/src/usermod.c
 ===================================================================
 --- shadow-4.8.1.orig/src/usermod.c
 +++ shadow-4.8.1/src/usermod.c
-@@ -1819,6 +1819,12 @@ static void usr_update (void)
+@@ -1849,6 +1849,12 @@
  static void move_home (void)
  {
  	struct stat sb;
@@ -108,7 +108,7 @@ Index: shadow-4.8.1/src/usermod.c
  
  	if (access (prefix_user_newhome, F_OK) == 0) {
  		/*
-@@ -1853,7 +1859,35 @@ static void move_home (void)
+@@ -1883,7 +1889,35 @@
  		}
  #endif
  
