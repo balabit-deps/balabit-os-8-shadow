@@ -1,3 +1,12 @@
+shadow (1:4.8.1-1ubuntu5.20.04.5) focal-security; urgency=medium
+
+  * SECURITY UPDATE: unsanitized buffer leading to a password leak during
+    gpasswd new password operation
+    - debian/patches/CVE-2023-4641.patch: fix password leak in gpasswd.
+    - CVE-2023-4641
+
+ -- Camila Camargo de Matos <camila.camargodematos@canonical.com>  Tue, 06 Feb 2024 09:49:54 -0300
+
 shadow (1:4.8.1-1ubuntu5.20.04.4) focal-security; urgency=medium
 
   * SECURITY REGRESSION: useradd command does not copy all of /etc/skel

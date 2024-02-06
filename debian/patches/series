@@ -20,3 +20,4 @@
 1013_extrausers_deluser.patch
 1014_extrausers_delgroup.patch
 1015_add_zsys_support.patch
+CVE-2023-4641.patch
